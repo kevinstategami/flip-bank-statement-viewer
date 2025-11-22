@@ -2,9 +2,9 @@ package service
 
 import (
 	"errors"
-
 	"flip-bank-statement-viewer/internal/model"
 	"flip-bank-statement-viewer/internal/repository"
+	"fmt"
 )
 
 type TransactionService interface {
@@ -28,13 +28,13 @@ func (s *transactionService) Upload(data []model.Transaction) error {
 
 	for i, t := range data {
 		if !isValidType(t.Type) {
-			return errors.New("invalid transaction type at row " + string(i) + ": " + string(t.Type))
+			return fmt.Errorf("invalid transaction type at row %d: %s", i+1, t.Type)
 		}
 		if !isValidStatus(t.Status) {
-			return errors.New("invalid transaction status at row " + string(i) + ": " + string(t.Status))
+			return fmt.Errorf("invalid transaction status at row %d: %s", i+1, t.Status)
 		}
 		if t.Amount < 0 {
-			return errors.New("invalid amount: cannot be negative")
+			return fmt.Errorf("invalid amount at row %d: cannot be negative", i+1)
 		}
 	}
 
@@ -61,7 +61,7 @@ func (s *transactionService) GetBalance() int64 {
 }
 
 func (s *transactionService) GetIssues() []model.Transaction {
-	var issues []model.Transaction
+	var issues []model.Transaction = []model.Transaction{}
 	for _, t := range s.repo.FindAll() {
 		if t.Status == model.Failed || t.Status == model.Pending {
 			issues = append(issues, t)
