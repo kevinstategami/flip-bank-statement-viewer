@@ -7,7 +7,7 @@ import (
 
 func TestParseCSV_Valid(t *testing.T) {
 	input := `
-1624507883,JOHN DOE,DEBIT,250000,SUCCESS,restaurant
+1624507883,JOHN DOE,SAT,250000,SUCCESS,restaurant
 1624608050,E-COMMERCE A,DEBIT,150000,FAILED,clothes
 `
 	reader := strings.NewReader(input)
