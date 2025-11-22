@@ -1,27 +1,118 @@
-# Flip Bank Statement Viewer - Backend (Go)
+# 📘 Flip Bank Statement Viewer — Backend (Golang)
 
-Simple backend for take-home test: upload CSV, compute balance, and list non-successful transactions.
+Backend service untuk memproses file CSV transaksi, menghitung balance, dan menampilkan transaksi bermasalah. Dibangun dengan **Golang**, menerapkan **Clean Architecture**, mendukung **Docker**, serta dilengkapi **GitHub Actions CI**.
 
-## Run locally
+---
 
-1. Clone / copy files
-2. `go run cmd/server/main.go`
-3. Server runs at `http://localhost:8080`
+## ⚙️ Tech Stack
+- Go 1.20+
+- Clean Architecture
+- Net/HTTP
+- Docker (Multi-stage)
+- GitHub Actions (Build + Test)
 
-## Endpoints
+---
 
-- `POST /upload` - multipart form with key `file` (CSV)
-- `GET /balance` - returns `{ "balance": "12345" }`
-- `GET /issues` - returns JSON array of FAILED or PENDING transactions
+## 📁 Project Structure
+├── cmd/
+│ └── server/
+│ └── main.go
+├── internal/
+│ ├── handler/ # HTTP handlers
+│ ├── model/ # Struct + enums
+│ ├── repository/ # Storage interface
+│ ├── service/ # Business logic
+│ └── storage/ # CSV parser
+├── go.mod
+├── go.sum
+└── Dockerfile
 
-## CSV format
 
-`timestamp, name, type, amount, status, description`
+---
 
-Use `sample.csv` as example.
+# 🚀 Running the App (Local)
 
-## Tests
+### 1. Clone repository
+```sh
+git clone <your-repo-url>
+cd flip-bank-statement-viewer
 
-Run unit tests:
-```bash
-go test ./...
+### 2. Install dependencies
+go mod tidy
+
+### 3. Run Server
+go run cmd/server/main.go
+server berjalan di:
+http://localhost:8080
+
+
+# TESTING API
+Upload CSV 
+curl -X POST -F "file=@sample.csv" http://localhost:8080/upload
+
+Get Balance
+curl http://localhost:8080/balance
+
+Get Issues
+curl http://localhost:8080/issues
+
+
+# 🐳 Running with Docker
+### 1. Build Image
+docker build -t flip-bank-viewer .
+### 2. Run container
+docker run -p 8080:8080 flip-bank-viewer
+### 3. Test
+http://localhost:8080/balance
+
+# 📦 GitHub Actions (CI Pipeline)
+### 1. go-ci.yml — Build & Test
+Berjalan otomatis pada:
+    push ke branch main
+    pull_request ke branch main
+
+Pipeline terdiri dari:
+    go mod download
+    go test ./...
+    go build ./cmd/server
+
+Tujuan:
+    Memastikan kode valid dan bisa di-compile
+    Unit test harus lulus sebelum merge
+
+### 2. docker.yml — Docker Build (Conditional)
+Workflow hanya berjalan jika ada perubahan pada file:
+Dockerfile
+    .github/workflows/docker.yml
+Pipeline:
+    docker build -t flip-bank-viewer .
+Tujuan:
+    Validasi Dockerfile hanya saat dibutuhkan
+    Mengurangi waktu CI
+
+# 🧪 Unit Tests
+Jalankan: 
+    go test ./...
+Unit test mencakup:
+    Validasi CSV
+    Validasi enum TYPE & STATUS
+    Hitung balance
+    Deteksi transaction issues
+
+### 📌 API Endpoints
+| Method | Endpoint   | Deskripsi                       |
+| ------ | ---------- | ------------------------------- |
+| POST   | `/upload`  | Upload file CSV                 |
+| GET    | `/balance` | Mendapatkan total balance       |
+| GET    | `/issues`  | List transaksi FAILED & PENDING |
+
+### 🎯 Status Fitur
+| Fitur                    | Status |
+| ------------------------ | ------ |
+| Upload + Validasi CSV    | ✔      |
+| Enum Type/Status         | ✔      |
+| Hitung Balance           | ✔      |
+| Issues (FAILED, PENDING) | ✔      |
+| Unit Test                | ✔      |
+| Docker Support           | ✔      |
+| CI Pipeline              | ✔      |
